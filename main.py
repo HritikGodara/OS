@@ -1,7 +1,6 @@
 import platform
 import psutil
 import cpuinfo
-import time
 
 print(f"Architecture: {platform.architecture()}")
 print(f"Network Name: {platform.node()}")
