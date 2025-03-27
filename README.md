@@ -1,80 +1,104 @@
 # Real-Time System Monitor
 
-![Project Banner](https://via.placeholder.com/1000x300?text=Real-Time+System+Monitor)
-
 ## Overview
 
-The **Real-Time System Monitor** is a versatile system monitoring tool that provides both a **Graphical User Interface (GUI)** and a **Command-Line Interface (CLI)** to track essential system metrics such as **CPU usage, memory consumption, disk activity, and network statistics**. The GUI leverages **PyQt5** and **PyQtGraph** for visualization, while the CLI version provides real-time updates in the terminal.
+This project is a real-time system monitoring application built with Python and PyQt5. It provides a graphical user interface to monitor CPU usage, memory usage, disk usage, network activity, and running processes. The application is divided into three modules for better organization and maintainability:
+
+- **Data Collecting**: Collects system metrics using `psutil`, `platform`, and `cpuinfo`.
+- **Data Processing**: Processes and stores collected data using `collections.deque` and `numpy`.
+- **GUI**: Implements the graphical user interface using `PyQt5` and `pyqtgraph`.
 
 ## Features
 
-### 🖥️ GUI Application
-- Displays real-time system metrics:
-  - **CPU Usage**
-  - **Memory Usage**
-  - **Disk Usage**
-  - **Network Activity**
-- Interactive real-time graphs for performance monitoring.
-- Alerts for high CPU and memory usage.
-- 
+- Real-time monitoring of CPU, memory, disk, and network usage.
+- Graphical representation of system metrics using plots.
+- Process management with the ability to terminate processes.
+- Search bar for filtering processes.
+- Start/Stop monitoring functionality.
+- Data export functionality.
+
+## Modules
+
+### 1. Data Collecting (`data_collector.py`)
+
+- Collects system information and metrics using `psutil`, `platform`, and `cpuinfo`.
+- Provides methods to fetch CPU info, memory info, disk info, disk usage, network usage, CPU usage, and memory usage.
+
+### 2. Data Processing (`data_processor.py`)
+
+- Processes and stores collected data.
+- Uses `collections.deque` to maintain a fixed-size window of recent data.
+- Provides methods to update and retrieve data.
+
+### 3. GUI (`gui.py`)
+
+- Implements the graphical user interface using `PyQt5` and `pyqtgraph`.
+- Displays real-time system metrics and plots.
+- Provides process management functionality.
+
 ## Installation
 
-### Prerequisites
-Ensure you have **Python 3.6+** installed on your system.
+1.  **Clone the repository:**
 
-### Steps
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/OS-monitor.git
-   cd OS-monitor
-   ```
-2. Install the required dependencies:
-   ```bash
-   pip install pyqt5 pyqtgraph psutil numpy matplotlib py-cpuinfo
-   ```
+    ```
+    git clone [repository_url]
+    cd [repository_directory]
+    ```
+
+2.  **Create a virtual environment:**
+
+    ```
+    python -m venv venv
+    ```
+
+3.  **Activate the virtual environment:**
+
+    -   On Windows:
+
+        ```
+        venv\Scripts\activate
+        ```
+
+    -   On macOS and Linux:
+
+        ```
+        source venv/bin/activate
+        ```
+
+4.  **Install the required packages:**
+
+    ```
+    pip install -r requirements.txt
+    ```
+
+    Create a `requirements.txt` file with the following content:
+
+    ```
+    psutil
+    pyqt5
+    pyqtgraph
+    numpy
+    cpuinfo
+    ```
 
 ## Usage
 
-### 🚀 Running the GUI Application
-```bash
-python main.py
-```
-This launches the graphical interface, displaying system metrics and real-time graphs.
+1.  **Run the application:**
 
-## Project Structure
+    ```
+    python main.py
+    ```
 
-```
-OS-monitor/
-├── GUI.py          # GUI-based system monitor
-├── monitor.py      # CLI-based system monitor
-├── LICENSE         # License information
-├── README.md       # Project documentation
-└── requirements.txt # List of required dependencies
-```
+2.  **Interact with the GUI:**
 
-## Screenshots
-
-### 🖥️ GUI Application
-![GUI Screenshot](https://via.placeholder.com/800x400?text=GUI+Screenshot)
-
-### 📊 CLI Application
-![CLI Screenshot](https://via.placeholder.com/800x400?text=CLI+Screenshot)
+    -   Monitor system metrics in real-time.
+    -   Use the process management tab to view and terminate processes.
+    -   Use the toolbar to start/stop monitoring and export data.
 
 ## Contributing
 
-🚀 Contributions are welcome! If you find a bug or have an idea for a new feature, feel free to:
-- Open an **issue** 📌
-- Submit a **pull request** 📥
+Contributions are welcome! Please fork the repository and submit a pull request with your changes.
 
 ## License
 
-This project is licensed under the **MIT License**. See the [`LICENSE`](LICENSE) file for details.
-
-## Acknowledgments
-- [PyQt5 Documentation](https://riverbankcomputing.com/software/pyqt/intro)
-- [PyQtGraph Documentation](http://www.pyqtgraph.org/)
-- [psutil Documentation](https://psutil.readthedocs.io/)
-
----
-⭐ If you find this project useful, consider giving it a star on [GitHub](https://github.com/your-username/OS-monitor)!
-
+[Specify the license under which the project is released. Example: MIT License]
