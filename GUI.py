@@ -1,158 +1,202 @@
 import sys
-import time
-import threading
-import psutil
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLabel
+from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QLabel, QFrame, QTabWidget, QTableView, QLineEdit, QHeaderView, QPushButton, QToolBar, QAction, QStatusBar, QSplitter
+from PyQt5.QtCore import QSortFilterProxyModel, Qt, QTimer
+from PyQt5.QtGui import QStandardItemModel, QStandardItem, QIcon
 from pyqtgraph import PlotWidget
 import numpy as np
 import platform
-from PyQt5.QtWidgets import QFrame
-import cpuinfo
+import psutil
 
-class SystemMonitor(QMainWindow):
-    def __init__(self):
+class GUI(QMainWindow):
+    def __init__(self, data_collector, data_processor):
         super().__init__()
         self.setWindowTitle("Real-Time System Monitor")
         self.setGeometry(100, 100, 1000, 800)
 
+        self.data_collector = data_collector
+        self.data_processor = data_processor
+
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
-        self.layout = QVBoxLayout()
+        self.layout = QVBoxLayout(self.central_widget)
+
+        # Create toolbar
+        self.toolbar = QToolBar("Main Toolbar")
+        self.addToolBar(self.toolbar)
+
+        # Add actions to toolbar
+        refresh_action = QAction(QIcon("refresh.png"), "Refresh", self)
+        refresh_action.setStatusTip("Refresh data")
+        refresh_action.triggered.connect(self.update_metrics)
+        self.toolbar.addAction(refresh_action)
+
+        start_action = QAction(QIcon("start.png"), "Start", self)
+        start_action.setStatusTip("Start monitoring")
+        start_action.triggered.connect(self.start_monitoring)
+        self.toolbar.addAction(start_action)
+
+        stop_action = QAction(QIcon("stop.png"), "Stop", self)
+        stop_action.setStatusTip("Stop monitoring")
+        stop_action.triggered.connect(self.stop_monitoring)
+        self.toolbar.addAction(stop_action)
+
+        export_action = QAction(QIcon("export.png"), "Export", self)
+        export_action.setStatusTip("Export data")
+        export_action.triggered.connect(self.export_data)
+        self.toolbar.addAction(export_action)
+
+        # Create status bar
+        self.status_bar = QStatusBar()
+        self.setStatusBar(self.status_bar)
+
+        # Create tab widget
+        self.tabs = QTabWidget()
+        self.layout.addWidget(self.tabs)
+
+        # Create system info tab
+        self.sys_info_tab = QWidget()
+        self.sys_info_layout = QVBoxLayout(self.sys_info_tab)
+        self.tabs.addTab(self.sys_info_tab, "System Info")
 
         # System Information Labels
         self.sys_info_label = QLabel("System Information")
         self.sys_info_label.setStyleSheet("font-weight: bold; font-size: 14px;")
-        self.layout.addWidget(self.sys_info_label)
-
-        # Get system information
-        self.cpu_info = self.get_cpu_info()
-        self.memory_info = self.get_memory_info()
-        self.disk_info = self.get_disk_info()
+        self.sys_info_layout.addWidget(self.sys_info_label)
 
         # Add system information labels
-        self.layout.addWidget(QLabel(f"CPU: {self.cpu_info['name']}"))
-        self.layout.addWidget(
-            QLabel(f"Cores: {self.cpu_info['cores']} (Physical), {self.cpu_info['logical_cores']} (Logical)"))
-        self.layout.addWidget(QLabel(f"Total RAM: {self.memory_info['total']:.1f} GB"))
-        self.layout.addWidget(QLabel(f"Total Disk: {self.disk_info['total']:.1f} GB"))
-        self.layout.addWidget(QLabel(f"OS: {platform.platform()}"))
+        self.sys_info_layout.addWidget(QLabel(f"CPU: {self.data_collector.cpu_info['name']}"))
+        self.sys_info_layout.addWidget(QLabel(f"Cores: {self.data_collector.cpu_info['cores']} (Physical), {self.data_collector.cpu_info['logical_cores']} (Logical)"))
+        self.sys_info_layout.addWidget(QLabel(f"Total RAM: {self.data_collector.memory_info['total']:.1f} GB"))
+        self.sys_info_layout.addWidget(QLabel(f"Total Disk: {self.data_collector.disk_info['total']:.1f} GB"))
+        self.sys_info_layout.addWidget(QLabel(f"OS: {platform.platform()}"))
 
         # Add a separator
         separator = QFrame()
         separator.setFrameShape(QFrame.HLine)
         separator.setFrameShadow(QFrame.Sunken)
-        self.layout.addWidget(separator)
+        self.sys_info_layout.addWidget(separator)
 
         # Labels
         self.cpu_label = QLabel("CPU Usage: 0%")
         self.memory_label = QLabel("Memory Usage: 0%")
         self.disk_label = QLabel("Disk Usage: 0%")
         self.network_label = QLabel("Network Usage: 0 MB")
-        self.layout.addWidget(self.cpu_label)
-        self.layout.addWidget(self.memory_label)
-        self.layout.addWidget(self.disk_label)
-        self.layout.addWidget(self.network_label)
+        self.sys_info_layout.addWidget(self.cpu_label)
+        self.sys_info_layout.addWidget(self.memory_label)
+        self.sys_info_layout.addWidget(self.disk_label)
+        self.sys_info_layout.addWidget(self.network_label)
 
         # Plots
         self.cpu_mem_graph = PlotWidget(title="CPU and Memory Usage")
         self.disk_net_graph = PlotWidget(title="Disk and Network Usage")
 
-        self.layout.addWidget(self.cpu_mem_graph)
-        self.layout.addWidget(self.disk_net_graph)
+        self.sys_info_layout.addWidget(self.cpu_mem_graph)
+        self.sys_info_layout.addWidget(self.disk_net_graph)
 
-        self.central_widget.setLayout(self.layout)
-
-        # Initialize data arrays
-        self.data_length = 50
-        self.cpu_data = np.zeros(self.data_length)
-        self.memory_data = np.zeros(self.data_length)
-        self.disk_data = np.zeros(self.data_length)
-        self.network_data = np.zeros(self.data_length)
-        self.temp_data = np.zeros(self.data_length)
-        self.time_data = np.arange(self.data_length)
-
-        # Set up plots
-        self.cpu_line = self.cpu_mem_graph.plot(self.time_data, self.cpu_data, pen='r', name='CPU')
-        self.mem_line = self.cpu_mem_graph.plot(self.time_data, self.memory_data, pen='b', name='Memory')
-        self.disk_line = self.disk_net_graph.plot(self.time_data, self.disk_data, pen='g', name='Disk')
-        self.net_line = self.disk_net_graph.plot(self.time_data, self.network_data, pen='m', name='Network')
+        self.cpu_line = self.cpu_mem_graph.plot(self.data_processor.time_data, [0]*len(self.data_processor.time_data), pen='r', name='CPU')
+        self.mem_line = self.cpu_mem_graph.plot(self.data_processor.time_data, [0]*len(self.data_processor.time_data), pen='b', name='Memory')
+        self.disk_line = self.disk_net_graph.plot(self.data_processor.time_data, [0]*len(self.data_processor.time_data), pen='g', name='Disk')
+        self.net_line = self.disk_net_graph.plot(self.data_processor.time_data, [0]*len(self.data_processor.time_data), pen='m', name='Network')
 
         # Add legends
         self.cpu_mem_graph.addLegend()
         self.disk_net_graph.addLegend()
 
-        # Start update thread
-        self.update_thread = threading.Thread(target=self.update_metrics, daemon=True)
-        self.update_thread.start()
+        # Create process management tab
+        self.process_tab = QWidget()
+        self.process_layout = QVBoxLayout(self.process_tab)
+        self.tabs.addTab(self.process_tab, "Process Management")
 
-    def get_cpu_info(self):
-        cpu_info = {}
-        try:
-            cpu_info['name'] = cpuinfo.get_cpu_info()['brand_raw']
-        except:
-            cpu_info['name'] = "Unknown CPU"
+        # Search bar for filtering processes
+        self.search_bar = QLineEdit()
+        self.search_bar.setPlaceholderText("Search processes...")
+        self.search_bar.textChanged.connect(self.filter_processes)
+        self.process_layout.addWidget(self.search_bar)
 
-        cpu_info['cores'] = psutil.cpu_count(logical=False)
-        cpu_info['logical_cores'] = psutil.cpu_count(logical=True)
-        return cpu_info
+        # Process table
+        self.process_table = QTableView()
+        self.process_layout.addWidget(self.process_table)
 
-    def get_memory_info(self):
-        memory = psutil.virtual_memory()
-        return {
-            'total': memory.total / (1024 ** 3),  # Convert to GB
-            'available': memory.available / (1024 ** 3),
-            'percent': memory.percent
-        }
+        # Model for process table
+        self.process_model = QStandardItemModel(0, 5)
+        self.process_model.setHorizontalHeaderLabels(["PID", "Name", "CPU %", "Memory %", "Terminate"])
+        self.process_table.setModel(self.process_model)
+        self.process_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
-    def get_disk_info(self):
-        disk = psutil.disk_usage('/')
-        return {
-            'total': disk.total / (1024 ** 3),  # Convert to GB
-            'used': disk.used / (1024 ** 3),
-            'free': disk.free / (1024 ** 3),
-            'percent': disk.percent
-        }
+        # Proxy model for sorting and filtering
+        self.proxy_model = QSortFilterProxyModel()
+        self.proxy_model.setSourceModel(self.process_model)
+        self.process_table.setModel(self.proxy_model)
+        self.process_table.setSortingEnabled(True)
 
-    def get_disk_usage(self):
-        return psutil.disk_usage('/').percent
-
-    def get_network_usage(self):
-        return psutil.net_io_counters().bytes_recv / 1024 / 1024  # Convert to MB
+        # Set up QTimer to update metrics
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_metrics)
+        self.timer.start(1000)  # Update every second
 
     def update_metrics(self):
-        while True:
-            # Get metrics
-            cpu_usage = psutil.cpu_percent()
-            memory_usage = psutil.virtual_memory().percent
-            disk_usage = self.get_disk_usage()
-            network_usage = self.get_network_usage()
+        cpu_usage = self.data_collector.get_cpu_usage()
+        memory_usage = self.data_collector.get_memory_usage()
+        disk_usage = self.data_collector.get_disk_usage()
+        network_usage = self.data_collector.get_network_usage()
 
-            # Update data arrays
-            self.cpu_data[:-1] = self.cpu_data[1:]
-            self.cpu_data[-1] = cpu_usage
-            self.memory_data[:-1] = self.memory_data[1:]
-            self.memory_data[-1] = memory_usage
-            self.disk_data[:-1] = self.disk_data[1:]
-            self.disk_data[-1] = disk_usage
-            self.network_data[:-1] = self.network_data[1:]
-            self.network_data[-1] = network_usage
+        self.data_processor.update_data(cpu_usage, memory_usage, disk_usage, network_usage['recv'])
 
-            # Update plots
-            self.cpu_line.setData(self.time_data, self.cpu_data)
-            self.mem_line.setData(self.time_data, self.memory_data)
-            self.disk_line.setData(self.time_data, self.disk_data)
-            self.net_line.setData(self.time_data, self.network_data)
+        data = self.data_processor.get_data()
+        self.cpu_line.setData(data['time'], data['cpu'])
+        self.mem_line.setData(data['time'], data['memory'])
+        self.disk_line.setData(data['time'], data['disk'])
+        self.net_line.setData(data['time'], data['network'])
 
-            # Update labels
-            self.cpu_label.setText(f"CPU Usage: {cpu_usage:.1f}%")
-            self.memory_label.setText(f"Memory Usage: {memory_usage:.1f}%")
-            self.disk_label.setText(f"Disk Usage: {disk_usage:.1f}%")
-            self.network_label.setText(f"Network Usage: {network_usage:.1f} MB")
+        self.cpu_label.setText(f"CPU Usage: {cpu_usage:.1f}%")
+        self.memory_label.setText(f"Memory Usage: {memory_usage:.1f}%")
+        self.disk_label.setText(f"Disk Usage: {disk_usage:.1f}%")
+        self.network_label.setText(f"Network Usage: Sent {network_usage['sent']:.1f} MB, Received {network_usage['recv']:.1f} MB")
 
-            time.sleep(1)
+        self.update_process_table()
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    monitor_window = SystemMonitor()
-    monitor_window.show()
-    sys.exit(app.exec_())
+    def update_process_table(self):
+        process_data = []
+        import psutil
+        for proc in psutil.process_iter(['pid', 'name', 'cpu_percent', 'memory_percent']):
+            try:
+                process_data.append(proc.info)
+            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+                continue
+
+        self.process_model.setRowCount(len(process_data))
+        for row, proc in enumerate(process_data):
+            self.process_model.setItem(row, 0, QStandardItem(str(proc['pid'])))
+            self.process_model.setItem(row, 1, QStandardItem(proc['name']))
+            self.process_model.setItem(row, 2, QStandardItem(f"{proc['cpu_percent']:.1f}"))
+            self.process_model.setItem(row, 3, QStandardItem(f"{proc['memory_percent']:.1f}"))
+
+            # Add terminate button
+            terminate_button = QPushButton("Terminate")
+            terminate_button.clicked.connect(lambda _, pid=proc['pid']: self.terminate_process(pid))
+            self.process_table.setIndexWidget(self.process_model.index(row, 4), terminate_button)
+
+    def terminate_process(self, pid):
+        try:
+            proc = psutil.Process(pid)
+            proc.terminate()
+            proc.wait(timeout=3)
+            print(f"Process {pid} terminated successfully.")
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.TimeoutExpired) as e:
+            print(f"Failed to terminate process {pid}: {e}")
+
+    def filter_processes(self, text):
+        self.proxy_model.setFilterRegExp(text)
+        self.proxy_model.setFilterKeyColumn(1)  # Filter by process name column
+
+    def start_monitoring(self):
+        self.timer.start(1000)
+        self.status_bar.showMessage("Monitoring started")
+
+    def stop_monitoring(self):
+        self.timer.stop()
+        self.status_bar.showMessage("Monitoring stopped")
+
+    def export_data(self):
+        # Implement data export functionality
+        self.status_bar.showMessage("Data exported")
