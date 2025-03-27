@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project is a real-time system monitoring application built with Python and PyQt5. It provides a graphical user interface to monitor CPU usage, memory usage, disk usage, network activity, and running processes. The application is divided into three modules for better organization and maintainability:
+A graphical dashboard that displays real-time information about process states, CPU usage, and memory consumption. The tool allows administrators to manage processes efficiently and identify potential issues promptly. The application is divided into three modules for better organization and maintainability:
 
 - **Data Collecting**: Collects system metrics using `psutil`, `platform`, and `cpuinfo`.
 - **Data Processing**: Processes and stores collected data using `collections.deque` and `numpy`.
