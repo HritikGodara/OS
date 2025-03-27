@@ -16,12 +16,7 @@ The **Real-Time System Monitor** is a versatile system monitoring tool that prov
   - **Network Activity**
 - Interactive real-time graphs for performance monitoring.
 - Alerts for high CPU and memory usage.
-
-### 🖥️ CLI Application
-- Displays system metrics and active processes in the terminal.
-- Real-time visualization of CPU, memory, disk, and network activity.
-- Alerts for high CPU and memory usage.
-
+- 
 ## Installation
 
 ### Prerequisites
@@ -42,15 +37,9 @@ Ensure you have **Python 3.6+** installed on your system.
 
 ### 🚀 Running the GUI Application
 ```bash
-python GUI.py
+python main.py
 ```
 This launches the graphical interface, displaying system metrics and real-time graphs.
-
-### 📊 Running the CLI Application
-```bash
-python monitor.py
-```
-This provides a terminal-based interface for monitoring system activity in real-time.
 
 ## Project Structure
 
