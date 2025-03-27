@@ -1,4 +1,4 @@
-# Real-Time System Monitor
+# Real-Time Process Monitoring Dashboard
 
 ## Overview
 
