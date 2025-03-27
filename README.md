@@ -21,20 +21,22 @@ A graphical dashboard that displays real-time information about process states, 
 
 ### 1. Data Collecting (`data_collector.py`)
 
-- Collects system information and metrics using `psutil`, `platform`, and `cpuinfo`.
-- Provides methods to fetch CPU info, memory info, disk info, disk usage, network usage, CPU usage, and memory usage.
+- Purpose: Gathers real-time information about system processes from the operating system.
+- Role: Acts as the data source for the dashboard, continuously fetching details like process IDs, names, states, CPU usage, and memory consumption. This module ensures the dashboard has up-to-date information to display.
 
 ### 2. Data Processing (`data_processor.py`)
 
-- Processes and stores collected data.
+- Purpose: Processes and organizes raw data collected from the system into a format suitable for visualization and analysis
 - Uses `collections.deque` to maintain a fixed-size window of recent data.
-- Provides methods to update and retrieve data.
+- Role: Filters, sorts, and aggregates process data to make it meaningful for administrators. It may also include basic logic to highlight potential issues, such as high resource usage, without requiring machine learning.
 
 ### 3. GUI (`gui.py`)
 
-- Implements the graphical user interface using `PyQt5` and `pyqtgraph`.
+- Purpose: Provides the graphical interface and visualizations for administrators to interact with the process data.
 - Displays real-time system metrics and plots.
 - Provides process management functionality.
+
+These modules work together seamlessly: the Data Collection Module feeds raw data to the Data Processing Module, which prepares it for the GUI Module to display.
 
 ## Installation
 
