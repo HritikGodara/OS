@@ -70,17 +70,7 @@ A graphical dashboard that displays real-time information about process states, 
     ```
     pip install -r requirements.txt
     ```
-
-    Create a `requirements.txt` file with the following content:
-
-    ```
-    psutil
-    pyqt5
-    pyqtgraph
-    numpy
-    cpuinfo
-    ```
-
+    
 ## Usage
 
 1.  **Run the application:**
@@ -94,10 +84,6 @@ A graphical dashboard that displays real-time information about process states, 
     -   Monitor system metrics in real-time.
     -   Use the process management tab to view and terminate processes.
     -   Use the toolbar to start/stop monitoring and export data.
-
-## Contributing
-
-Contributions are welcome! Please fork the repository and submit a pull request with your changes.
 
 ## License
 
