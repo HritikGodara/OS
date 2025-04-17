@@ -1,6 +1,6 @@
 # 🖥️ Real-Time System Monitoring Dashboard
 
-![Dashboard Preview](https://via.placeholder.com/800x400?text=Dashboard+Preview)
+![Real-Time Monitor](https://github.com/user-attachments/assets/8517e182-0a79-4bf5-98d9-456cb850ad69)
 
 ## 🌟 Overview
 
@@ -140,4 +140,4 @@ For any questions or feedback, feel free to reach out:
 
 ---
 
-![Footer Image](https://via.placeholder.com/800x100?text=Happy+Coding!+🚀)
+![Footer](https://github.com/user-attachments/assets/655fbeb5-401d-494d-af1b-cf8d33c2a750)
