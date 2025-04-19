@@ -1,6 +1,5 @@
 # 🖥️ Real-Time System Monitoring Dashboard
 
-![Real-Time Monitor](https://github.com/user-attachments/assets/8517e182-0a79-4bf5-98d9-456cb850ad69)
 
 ## 🌟 Overview
 
@@ -120,8 +119,8 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
 
 For any questions or feedback, feel free to reach out:
 
-- **Email**: [your_email@example.com](mailto:your_email@example.com)
-- **GitHub**: [Your GitHub Profile](https://github.com/yourusername)
+- **Email**: [your_email@example.com](mailto:arinchoubey9@gmail.com)
+- **GitHub**: [Your GitHub Profile](https://github.com/Anonymous-0143)
 
 ---
 
@@ -140,4 +139,3 @@ For any questions or feedback, feel free to reach out:
 
 ---
 
-![Footer](https://github.com/user-attachments/assets/655fbeb5-401d-494d-af1b-cf8d33c2a750)
