@@ -86,7 +86,7 @@ python main.py
 ## 🖼️ Screenshots
 
 ### 📊 Dashboard
-![Dashboard](https://via.placeholder.com/800x400?text=Dashboard+Screenshot)
+![Screenshot 2025-04-17 232425](https://github.com/user-attachments/assets/69c20bcb-5062-4c96-9695-57b33e2cf342)
 
 ### 🔍 Process Management
 ![Process Management](https://via.placeholder.com/800x400?text=Process+Management+Screenshot)
