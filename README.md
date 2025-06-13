@@ -119,8 +119,7 @@ This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) f
 
 For any questions or feedback, feel free to reach out:
 
-- **Email**: [your_email@example.com](mailto:arinchoubey9@gmail.com)
-- **GitHub**: [Your GitHub Profile](https://github.com/Anonymous-0143)
+- **Email**: [hritik.godara114@gmail.com](mailto:hritik.godara114@gmail.com)
 
 ---
 
